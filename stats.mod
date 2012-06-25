@@ -836,41 +836,6 @@ static double randwd(void* vv) {
 }
 ENDVERBATIM
  
-:* v1.hash(veclist)
-VERBATIM
-static double hash (void* vv) {
-  int i, j, nx, nv[VRRY], num, vfl; 
-  union dblint xx;
-  Object* ob;
-  double *x, *vvo[VRRY], big, y, prod;
-  nx = vector_instance_px(vv, &x);
-  if (ifarg(1)) {
-    vfl=0;
-    ob=*hoc_objgetarg(1); 
-    num = ivoc_list_count(ob);
-    if (num>VRRY) {printf("vecst:hash ERR: can only handle %d vecs: %d\n",VRRY,num); hxe();}
-    for (i=0;i<num;i++) { nv[i] = list_vector_px(ob, i, &vvo[i]);
-      if (nx!=nv[i]) { printf("vecst:hash ERR %d %d %d\n",i,nx,nv[i]);hxe();}}
-  } else {
-    vfl=1; num=nx; nx=1; // outer loop will go only once
-  }
-  big=pow(DBL_MAX,1./(double)num); // base biggest # on nth root of num of values being used
-  for (i=0;i<nx;i++) {
-    for (j=0,prod=1;j<num;j++) {
-      if (vfl) {  xx.d=x[j];       // break the double up into 2 unsigned ints
-      } else   {  xx.d=vvo[j][i]; }
-      if (xx.i[0]==0) { xx.i[0]=xx.i[1]; xx.i[0]<<=4; } // high order bits may be 0
-      if (xx.i[1]==0) { xx.i[1]=xx.i[0]; xx.i[1]<<=4; } // low order bits unlikely 0
-      mcell_ran4_init(&xx.i[1]);
-      mcell_ran4(&xx.i[0], &y, 1, big); // generate a pseudorand number based on these
-      prod*=y;  // keep multiplying these out
-    }
-    if (! vfl) x[i]=prod; else return prod; // just return the 1 value
-  }
-  return (double)nx;
-}
-ENDVERBATIM
-
 :* v1.smash(veclist,base)
 : smash squeezes a set of numbers into a single double by considering them as digits
 : in base base -- x[i]+=vvo[i][j]*wt; where wt is base^i
@@ -1916,7 +1881,6 @@ VERBATIM
   install_vector_method("rantran", rantran);
   install_vector_method("distance", distance);
   install_vector_method("ndprd", ndprd);
-  install_vector_method("hash", hash);
   install_vector_method("smash", smash);
   install_vector_method("smash1", smash1);
   install_vector_method("dpro", dpro);
@@ -2011,47 +1975,6 @@ FUNCTION getseed () {
   VERBATIM
   seed=(double)valseed;
   return seed;
-  ENDVERBATIM
-}
-
-VERBATIM
-unsigned int hashseed2 (int na, double* x) {
-  int i; union dblint xx; double y, big;
-  big=pow(DBL_MAX,1./(double)(na+1)); // base biggest # on nth root of num of values being used
-  valseed=1;
-  for (i=0;i<na;i++) {
-    if (x[i]==0.0) continue;
-    xx.d=x[i];
-    if (xx.i[0]==0) { xx.i[0]=xx.i[1]; xx.i[0]<<=4; } // high order bits may be 0
-    if (xx.i[1]==0) { xx.i[1]=xx.i[0]; xx.i[1]<<=4; } // low order bits unlikely 0
-    xx.i[0]+=(i+1); xx.i[1]+=(i+1); // so different for different order args
-    mcell_ran4_init(&xx.i[1]);
-    mcell_ran4(&xx.i[0], &y, 1, big); // generate a pseudorand number based on these
-    while (y>UINT_MAX) y/=1e9; // UINT_MAX is 4.294967e+09
-    valseed*=(unsigned int)y;  // keep multiplying these out
-  }
-  return valseed; // global
-}
-ENDVERBATIM
-
-FUNCTION hashseed () {
-  VERBATIM
-  int i,na,nb,sf=0; double *x=0;
-  if (hoc_is_double_arg(2)) {
-    for (na=1;ifarg(na);na++); 
-    na--;
-    if (na==1) nb=2; else nb=na;
-    x = (double *) malloc(sizeof(double)*nb);
-    for (i=1;i<=na;i++) x[i-1]=*getarg(i);
-    if (na==1) x[1]=x[0]*x[0]+13; // so can get something
-    sf=1;//should free
-  } else {
-    nb=(int)*getarg(1);
-    x=hoc_pgetarg(2);
-  } 
-  hashseed2(nb,x);
-  if(sf) free(x); //only free if malloc'd
-  _lhashseed=(double)valseed;
   ENDVERBATIM
 }
 
