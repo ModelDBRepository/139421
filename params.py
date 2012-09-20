@@ -9,6 +9,7 @@ h.tstop=3e3
 h.dt = 0.1
 h.steps_per_ms = 1/h.dt
 #h.cvode_local(1)
+h.v_init = -65
 
 
 # network NMDA params
