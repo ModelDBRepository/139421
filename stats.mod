@@ -20,7 +20,7 @@ v.unnan([nan_value,][inf_value])  // remove nan's and inf's from a vector
 ENDCOMMENT
 
 NEURON {
-THREADSAFE
+: note THREADSAFE made stats.mod compile with errors in nrn version (1119:b3f8ab0f8203)
   SUFFIX stats
   GLOBAL  INSTALLED,seed,kmeasure,verbose,self_ok_combi,hretval,flag,transpose,newline
 }
