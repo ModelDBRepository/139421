@@ -47,6 +47,7 @@ of gamma in a computer model of hippocampus Submitted: January 28th,
 
 For questions email: samn at neurosim dot downstate dot edu
 
+## Changelog
 20120625 applied updates from Bill that work toward compatibility with  
 Mac OS X: infot.mod was removed and misc.h, stats.mod replaced.  
 20120920 an update from Sam where h.v_init is set to -65 in params.py,  
@@ -57,7 +58,4 @@ latest version of the model.
 20220523 Updated MOD files to contain valid C++ and be compatible with the  
 upcoming versions 8.2 and 9.0 of NEURON.  
 20221216 Python3 migration via 2to3
-
----
-
-2025-06-20: Converted README to Markdown.
+20250620 Converted README to Markdown.
